@@ -4,9 +4,9 @@ const candidatosRoutes = Router();
 
 let candidatos = [
     {  
-   id: Math.random() * 1000000,
+   id: Math.floor(Math.random() * 1000000),
     nome: "Capitã Lucimara",
-    partido: "Partido Aleatório",
+    partido: "PSD",
     idade: 42,
     segundo: true, // Concorrente ao segundo mandato
     propostas: [
@@ -18,29 +18,63 @@ let candidatos = [
 ];
 
 //rota pra buscar todas candidatos
-candidatosRoutes.post("/", (req, res) => {
+candidatosRoutes.get("/", (req, res) => {
+   return res.status(200).send(candidatos)
 });
 
-candidatosRoutes.get("/", (req, res) => {
-    return res .status(200).send(candidatos);
-});
-candidatosRoutes.post("/candidatos", (req, res) => {
-    const { nome, cor } = req.body;
-    const novaEmocao = {
-        id: candidatos.length + 1,
-        nome: nome,
-        cor: cor
+candidatosRoutes.post("/", (req, res) => {
+    const { nome, partido, idade, segundo, propostas } = req.body;
+
+    //Validação dos campos nome e partido
+
+if(!nome || !partido) {
+    return res.status(400).send({
+        message: "O nome ou o partido não foi preenchido!"
+    });
+} 
+    // validação de idade
+    if(idade < 18) {
+        return res.status(400).send({
+            message: "O candidato não é adulto!"
+        })
     }
 
+    const novoCandidato = {
+        id: Math.floor(Math.random() * 1000000),
+        nome, 
+        partido,
+        idade,
+        segundo, 
+        propostas 
+    }
 
-    candidatos.push(novaEmocao)
-    return res .status(201).send(novaEmocao);
+    candidatos.push(novoCandidato);
+
+    return res.status(201).send({
+        message: "Candidato cadastrado com sucesso!",
+        novoCandidato,
+    });
 });
-candidatosRoutes.get ("/:id", (req, res)  => {
-    const {id} = req.params;
-    console.log(id);
 
-    //console.log(id);
+candidatosRoutes.get("/:id", (req, res) => {
+    const {id} = req.params;
+ 
+//console.log(id);
+
+    const candidato = candidatos.find((politico) => politico.id == id);
+
+  if (!candidato){  
+    return res.status(404).send({
+        message: "Candidato não encontrado",
+    });
+}
+
+
+
+
+
+
+
 
   const emocao = candidatos.find((emotion) => emotion.id == id)
 
